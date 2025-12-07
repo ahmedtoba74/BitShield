@@ -1,4 +1,8 @@
-README.md
+# 🛡️ BitShield: Digital Communication System Simulation
+
+**BitShield** is a robust simulation tool for end-to-end digital communication, designed to demonstrate the efficiency of **Source Coding** and the reliability of **Channel Coding**.
+
+## 🚀 Project Features
 
 1.  **Source Coding:** Compression using Huffman Coding Algorithm.
 2.  **Channel Coding:** Error detection & correction using Hamming(7,4) Code.
