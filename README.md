@@ -1,8 +1,4 @@
-# Information Theory Project: Digital Communication System Simulation
-
-A complete simulation of a digital communication system developed using **Node.js**. The project implements Source Coding (Huffman) and Channel Coding (Hamming 7,4) with Noise simulation.
-
-## 🚀 Project Features
+README.md
 
 1.  **Source Coding:** Compression using Huffman Coding Algorithm.
 2.  **Channel Coding:** Error detection & correction using Hamming(7,4) Code.
