@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -5,7 +6,7 @@ const apiRoutes = require("./src/routes/api.js");
 const fs = require("fs");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
@@ -31,6 +32,5 @@ app.get("/", (req, res) => {
 
 // Start Server
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-    console.log(`Upload API available at http://localhost:${PORT}/api/process`);
+    console.log(`Server is running on port ${PORT}`);
 });
