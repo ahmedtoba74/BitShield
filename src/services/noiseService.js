@@ -1,3 +1,4 @@
+// Inject Noise
 exports.injectNoise = (binaryString, errorRate = 0.05) => {
     let noisyData = "";
     let totalErrors = 0;

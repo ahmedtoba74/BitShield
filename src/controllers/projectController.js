@@ -6,7 +6,7 @@ const noiseService = require("../services/noiseService.js");
 
 exports.processFile = (req, res) => {
     try {
-        // 0. التحقق من الملف
+        // 0. if no file uploaded
         if (!req.file) {
             return res.status(400).send({
                 error: "No file uploaded. Please upload a .txt file.",
@@ -14,7 +14,7 @@ exports.processFile = (req, res) => {
         }
 
         const originalText = req.file.buffer.toString("utf8");
-        const timestamp = Date.now(); // لتمييز الملفات
+        const timestamp = Date.now(); // To identify files
 
         console.log(
             `[${timestamp}] New request received. Length: ${originalText.length} chars.`
@@ -41,7 +41,7 @@ exports.processFile = (req, res) => {
         // ======================================================
         // Part 3: Huffman Decoding (Verification Check) & File Output
         // ======================================================
-        // "عاوز اناقشه معاك الاول... واعمله decoding وارجعه لاصله"
+        //
         const decodedPart3 = huffmanService.decode(encodedBinary, huffmanTree);
 
         const checkFileName = `2_part3_check_${timestamp}.txt`;
@@ -56,8 +56,8 @@ exports.processFile = (req, res) => {
         // ======================================================
         // Part 5: Noise Injection
         // ======================================================
-        // "ادخل عليه random noise"
-        // نسبة الخطأ هنا 10% (0.1) تقدر تغيرها
+        // Inject noise
+        // Noise rate
         const NOISE_RATE = 0.01;
         const { noisyData, noiseReport } = noiseService.injectNoise(
             hammingEncoded,
@@ -73,7 +73,7 @@ exports.processFile = (req, res) => {
         // ======================================================
         // Final Step: Reconstruct Final Text & File Output
         // ======================================================
-        // "اشوف هل قدرت اعالج noise... واكتبه في ملف"
+        // If the final text is longer than the original, truncate it
         const finalText = huffmanService.decode(correctedBinary, huffmanTree);
 
         if (finalText.length > originalText.length) {
@@ -84,7 +84,7 @@ exports.processFile = (req, res) => {
         const finalPath = path.join(__dirname, "../../outputs", finalFileName);
         fs.writeFileSync(finalPath, finalText);
 
-        // حساب الكفاءة للعرض
+        // Calculate efficiency for display
         const efficiency = (
             (correctionReport.correctedErrors / noiseReport.totalErrors) *
             100
@@ -101,7 +101,7 @@ exports.processFile = (req, res) => {
             if (originalText[i] === finalText[i]) correctChars++;
         }
         const finalTextEfficiency = (
-            (correctChars / originalText.length) *
+            (finalText.length / originalText.length) *
             100
         ).toFixed(2);
         // ======================================================

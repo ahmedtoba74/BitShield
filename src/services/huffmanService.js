@@ -7,12 +7,12 @@ class Node {
     }
 }
 
-// دالة مساعدة لترتيب النودز
+// Helper function to sort nodes
 function sortNodes(nodes) {
     return nodes.sort((a, b) => a.freq - b.freq);
 }
 
-// 1. تحليل الاحتمالات (Part 1 Logic)
+// 1. Analyze Probabilities (Part 1 Logic)
 exports.analyzeProbabilities = (text) => {
     const freqMap = {};
     for (let char of text) {
@@ -22,10 +22,10 @@ exports.analyzeProbabilities = (text) => {
     const totalChars = text.length;
     let outputString = "Symbol Analysis (Part 1):\n-------------------------\n";
 
-    // تنسيق الناتج للملف (Symbol - Probability)
+    // Format the output for the file (Symbol - Probability)
     for (let char in freqMap) {
         const prob = (freqMap[char] / totalChars).toFixed(4);
-        // التعامل مع المسافة والسطر الجديد عشان يبانوا في الملف
+        // Handle spacing and new line for file output
         let displayChar = char;
         if (char === " ") displayChar = "Space";
         if (char === "\n") displayChar = "NewLine";
@@ -37,7 +37,7 @@ exports.analyzeProbabilities = (text) => {
     return { frequencyMap: freqMap, formattedOutput: outputString };
 };
 
-// 2. بناء الشجرة وتوليد الأكواد (Part 2 Core)
+// 2. Building the tree and generating codes (Part 2 Core)
 exports.buildHuffmanTree = (freqMap) => {
     let nodes = [];
     for (let char in freqMap) {
@@ -64,7 +64,7 @@ function generateCodes(node, currentCode, codesMap) {
     generateCodes(node.right, currentCode + "1", codesMap);
 }
 
-// دالة التشفير
+// Encoding (Part 2 & 3)
 exports.encode = (text, freqMap) => {
     const root = exports.buildHuffmanTree(freqMap);
     const codesMap = {};
@@ -78,7 +78,7 @@ exports.encode = (text, freqMap) => {
     return { encodedBinary, huffmanTree: root, codesMap };
 };
 
-// 3. دالة فك التشفير (Part 3 & Final)
+// 3. Decoding (Part 3 & Final)
 exports.decode = (binaryString, rootNode) => {
     let decodedText = "";
     let currentNode = rootNode;

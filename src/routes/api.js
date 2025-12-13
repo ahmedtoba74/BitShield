@@ -3,11 +3,11 @@ const router = express.Router();
 const multer = require("multer");
 const projectController = require("../controllers/projectController");
 
-// إعداد Multer لتخزين الملف في الذاكرة (Buffer) مؤقتاً
+// Temporary storage for multer
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// الرابط: POST /api/process
+// POST /api/process
 router.post(
     "/process",
     upload.single("textFile"),

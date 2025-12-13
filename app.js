@@ -12,13 +12,13 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// التأكد من وجود مجلد outputs
+// create outputs directory if it doesn't exist
 const outputsDir = path.join(__dirname, "outputs");
 if (!fs.existsSync(outputsDir)) {
     fs.mkdirSync(outputsDir);
 }
 
-// جعل مجلد outputs عام عشان نقدر نحمل الملفات منه
+// static files
 app.use("/outputs", express.static(path.join(__dirname, "outputs")));
 
 app.use(express.static(path.join(__dirname, "public")));
