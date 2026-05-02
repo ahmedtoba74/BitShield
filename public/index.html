@@ -1,571 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>🛡️BitShield | Digital Communication Sim</title>
-        <link
-            href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
-            rel="stylesheet"
-        />
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        />
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🛡️BitShield | HARQ Communication Simulator</title>
+    <meta name="description" content="Advanced HARQ simulation with Incremental Redundancy, CRC-16, and Extended Hamming coding" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>🛡️ BitShield</h1>
+            <p>Combined Error Detection & Correction with Incremental Redundancy</p>
+            <div class="uni-info">Beni-Suef University | Faculty of Engineering | Comm. & Electronics Dept.</div>
+        </div>
+    </header>
 
-        <style>
-            :root {
-                --primary-color: #0d47a1; /* Deep Blue */
-                --secondary-color: #1976d2;
-                --accent-color: #00e676; /* Green for success */
-                --bg-color: #f4f6f8;
-                --card-bg: #ffffff;
-                --text-color: #333;
-            }
+    <nav class="tab-bar">
+        <button class="tab-btn active" data-tab="classic"><i class="fas fa-microchip"></i> Classic Mode</button>
+        <button class="tab-btn" data-tab="harq"><i class="fas fa-satellite-dish"></i> HARQ Simulation</button>
+        <button class="tab-btn" data-tab="analysis"><i class="fas fa-chart-line"></i> Performance Analysis</button>
+    </nav>
 
-            body {
-                font-family: "Roboto", sans-serif;
-                background-color: var(--bg-color);
-                margin: 0;
-                color: var(--text-color);
-            }
-
-            /* Header Style */
-            header {
-                background: linear-gradient(
-                    135deg,
-                    var(--primary-color),
-                    var(--secondary-color)
-                );
-                color: white;
-                padding: 20px 0;
-                text-align: center;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            }
-            header h1 {
-                margin: 0;
-                font-size: 2.2rem;
-            }
-            header p {
-                margin: 5px 0 0;
-                opacity: 0.9;
-                font-weight: 300;
-            }
-            .uni-info {
-                font-size: 0.9rem;
-                margin-top: 10px;
-                opacity: 0.8;
-            }
-
-            /* Container */
-            .container {
-                max-width: 1000px;
-                margin: 30px auto;
-                padding: 0 20px;
-            }
-
-            /* Upload Section */
-            .upload-card {
-                background: var(--card-bg);
-                border-radius: 12px;
-                padding: 40px;
-                text-align: center;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-                transition: transform 0.3s;
-            }
-            .file-input-wrapper {
-                position: relative;
-                overflow: hidden;
-                display: inline-block;
-                margin-bottom: 20px;
-            }
-            .btn-upload {
-                border: 2px dashed var(--secondary-color);
-                color: var(--secondary-color);
-                background-color: white;
-                padding: 15px 40px;
-                border-radius: 8px;
-                font-size: 16px;
-                font-weight: bold;
-                cursor: pointer;
-                transition: 0.3s;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-            .btn-upload:hover {
-                background-color: #e3f2fd;
-            }
-            input[type="file"] {
-                font-size: 100px;
-                position: absolute;
-                left: 0;
-                top: 0;
-                opacity: 0;
-                cursor: pointer;
-            }
-            .btn-submit {
-                background-color: var(--primary-color);
-                color: white;
-                border: none;
-                padding: 12px 30px;
-                font-size: 16px;
-                border-radius: 6px;
-                cursor: pointer;
-                display: block;
-                margin: 0 auto;
-                width: 200px;
-                transition: 0.3s;
-            }
-            .btn-submit:hover {
-                background-color: #002171;
-            }
-            .btn-submit:disabled {
-                background-color: #ccc;
-                cursor: not-allowed;
-            }
-
-            /* Loader */
-            .loader {
-                display: none;
-                margin: 20px auto;
-                border: 5px solid #f3f3f3;
-                border-top: 5px solid var(--secondary-color);
-                border-radius: 50%;
-                width: 40px;
-                height: 40px;
-                animation: spin 1s linear infinite;
-            }
-            @keyframes spin {
-                0% {
-                    transform: rotate(0deg);
-                }
-                100% {
-                    transform: rotate(360deg);
-                }
-            }
-
-            /* Results Section (Hidden initially) */
-            #resultsSection {
-                display: none;
-                animation: fadeIn 0.5s;
-            }
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-
-            /* Stats Grid */
-            .stats-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 20px;
-                margin-top: 30px;
-            }
-            .stat-card {
-                background: var(--card-bg);
-                padding: 20px;
-                border-radius: 10px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-                border-left: 5px solid var(--secondary-color);
-            }
-            .stat-card h3 {
-                margin-top: 0;
-                color: var(--primary-color);
-                font-size: 1.2rem;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-            .stat-row {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 10px;
-                font-size: 0.95rem;
-            }
-            .stat-value {
-                font-weight: bold;
-                color: #333;
-            }
-
-            /* Progress Bar */
-            .progress-container {
-                background-color: #e0e0e0;
-                border-radius: 10px;
-                height: 8px;
-                margin-top: 5px;
-                overflow: hidden;
-            }
-            .progress-bar {
-                height: 100%;
-                border-radius: 10px;
-                background-color: var(--accent-color);
-                width: 0%;
-                transition: width 1s ease-in-out;
-            }
-
-            /* Download Section */
-            .download-section {
-                display: flex;
-                justify-content: center;
-                gap: 15px;
-                margin-top: 30px;
-                flex-wrap: wrap;
-            }
-            .btn-download {
-                text-decoration: none;
-                background-color: white;
-                color: #333;
-                border: 1px solid #ddd;
-                padding: 15px 20px;
-                border-radius: 8px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                transition: 0.3s;
-                font-weight: 500;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            }
-            .btn-download i {
-                color: var(--primary-color);
-                font-size: 1.2rem;
-            }
-            .btn-download:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-                border-color: var(--primary-color);
-            }
-
-            /* Footer */
-            footer {
-                margin-top: 50px;
-                text-align: center;
-                padding: 20px;
-                background-color: #fff;
-                color: #666;
-                font-size: 0.9rem;
-                border-top: 1px solid #eee;
-            }
-            .team-list {
-                list-style: none;
-                padding: 0;
-                margin: 10px 0;
-                display: flex;
-                justify-content: center;
-                gap: 20px;
-                flex-wrap: wrap;
-            }
-            .team-list li {
-                font-weight: 500;
-                color: var(--primary-color);
-            }
-        </style>
-    </head>
-    <body>
-        <header>
-            <h1>🛡️BitShield</h1>
-            <p>Advanced Simulation for Huffman & Hamming(7,4) Coding</p>
-            <div class="uni-info">
-                Beni-Suef University | Faculty of Engineering | Comm. &
-                Electronics Dept.
-            </div>
-        </header>
-
-        <div class="container">
+    <div class="container">
+        <!-- ==================== TAB 1: CLASSIC MODE ==================== -->
+        <div class="tab-content active" id="tab-classic">
             <div class="upload-card">
-                <h2>
-                    <i class="fas fa-cloud-upload-alt"></i> Upload Text File
-                </h2>
-                <p>
-                    Select a .txt file to start the simulation loop (Compression
-                    -> Noise -> Correction)
-                </p>
-
-                <form id="uploadForm">
+                <h2><i class="fas fa-cloud-upload-alt"></i> Classic Huffman + Hamming(7,4)</h2>
+                <p>Original pipeline: Compression → Noise → Correction (single pass, no IR)</p>
+                <form id="classicForm">
                     <div class="file-input-wrapper">
-                        <button class="btn-upload" type="button">
-                            <i class="fas fa-file-alt"></i>
-                            <span id="fileName">Choose File...</span>
-                        </button>
-                        <input
-                            type="file"
-                            name="textFile"
-                            id="fileInput"
-                            accept=".txt"
-                            required
-                            onchange="updateFileName()"
-                        />
+                        <label class="btn-upload" for="classicFile"><i class="fas fa-file-alt"></i><span id="classicFileName">Choose File...</span></label>
+                        <input type="file" id="classicFile" accept=".txt" required />
                     </div>
-                    <br />
-                    <button type="submit" class="btn-submit" id="submitBtn">
-                        Start Simulation
-                    </button>
+                    <button type="submit" class="btn-submit" id="classicSubmit">Start Simulation</button>
                 </form>
-
-                <div class="loader" id="loader"></div>
+                <div class="loader" id="classicLoader"></div>
             </div>
-
-            <div id="resultsSection">
+            <div id="classicResults" class="results-hidden">
                 <div class="download-section">
-                    <a
-                        href="#"
-                        id="linkProb"
-                        class="btn-download"
-                        target="_blank"
-                        download
-                    >
-                        <i class="fas fa-list-ol"></i> Symbol Probabilities
-                        (Part 1)
-                    </a>
-                    <a
-                        href="#"
-                        id="linkCheck"
-                        class="btn-download"
-                        target="_blank"
-                        download
-                    >
-                        <i class="fas fa-check-circle"></i> Decoding Check (Part
-                        3)
-                    </a>
-                    <a
-                        href="#"
-                        id="linkFinal"
-                        class="btn-download"
-                        style="
-                            border-color: var(--accent-color);
-                            background-color: #f0fff4;
-                        "
-                        target="_blank"
-                        download
-                    >
-                        <i class="fas fa-file-signature"></i> Final Restored
-                        Text
-                    </a>
+                    <a href="#" id="linkProb" class="btn-download" download><i class="fas fa-list-ol"></i> Symbol Probabilities</a>
+                    <a href="#" id="linkCheck" class="btn-download" download><i class="fas fa-check-circle"></i> Decoding Check</a>
+                    <a href="#" id="linkFinal" class="btn-download btn-download-accent" download><i class="fas fa-file-signature"></i> Final Restored Text</a>
                 </div>
-
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>
-                            <i class="fas fa-compress-arrows-alt"></i> Source
-                            Coding (Huffman)
-                        </h3>
-                        <div class="stat-row">
-                            <span>Original Size:</span>
-                            <span class="stat-value" id="origSize">0 bits</span>
-                        </div>
-                        <div class="stat-row">
-                            <span>Compressed Size:</span>
-                            <span class="stat-value" id="compSize">0 bits</span>
-                        </div>
-                        <div class="stat-row">
-                            <span>Compression Ratio:</span>
-                            <span class="stat-value" id="compRatio">0%</span>
-                        </div>
-                        <div class="progress-container">
-                            <div class="progress-bar" id="compBar"></div>
-                        </div>
-                    </div>
-
-                    <div class="stat-card" style="border-left-color: #ff9800">
-                        <h3>
-                            <i class="fas fa-bolt"></i> Channel (Noise &
-                            Hamming)
-                        </h3>
-                        <div class="stat-row">
-                            <span>Transmitted Bits:</span>
-                            <span class="stat-value" id="transBits">0</span>
-                        </div>
-                        <div class="stat-row">
-                            <span>Errors Injected:</span>
-                            <span
-                                class="stat-value"
-                                id="errInj"
-                                style="color: red"
-                                >0</span
-                            >
-                        </div>
-                        <div class="stat-row">
-                            <span>Errors Corrected:</span>
-                            <span
-                                class="stat-value"
-                                id="errCorr"
-                                style="color: green"
-                                >0</span
-                            >
-                        </div>
-                        <div class="stat-row">
-                            <span>Correction Efficiency:</span>
-                            <span class="stat-value" id="corrEff">0%</span>
-                        </div>
-                        <div class="progress-container">
-                            <div
-                                class="progress-bar"
-                                id="corrBar"
-                                style="background-color: #ff9800"
-                            ></div>
-                        </div>
-                    </div>
-
-                    <div
-                        class="stat-card"
-                        style="border-left-color: var(--accent-color)"
-                    >
-                        <h3>
-                            <i class="fas fa-flag-checkered"></i> Final Output
-                            Quality
-                        </h3>
-                        <div class="stat-row">
-                            <span>Original Bytes:</span>
-                            <span class="stat-value" id="origBytes">0</span>
-                        </div>
-                        <div class="stat-row">
-                            <span>Restored Bytes:</span>
-                            <span class="stat-value" id="finalBytes">0</span>
-                        </div>
-                        <div class="stat-row">
-                            <span>Text Match Accuracy:</span>
-                            <span class="stat-value" id="finalAcc">0%</span>
-                        </div>
-                        <div class="progress-container">
-                            <div class="progress-bar" id="accBar"></div>
-                        </div>
-                    </div>
+                    <div class="stat-card"><h3><i class="fas fa-compress-arrows-alt"></i> Source Coding (Huffman)</h3><div class="stat-row"><span>Original Size:</span><span class="stat-value" id="origSize">0 bits</span></div><div class="stat-row"><span>Compressed Size:</span><span class="stat-value" id="compSize">0 bits</span></div><div class="stat-row"><span>Compression Ratio:</span><span class="stat-value" id="compRatio">0%</span></div><div class="progress-container"><div class="progress-bar" id="compBar"></div></div></div>
+                    <div class="stat-card card-orange"><h3><i class="fas fa-bolt"></i> Channel (Noise & Hamming)</h3><div class="stat-row"><span>Transmitted Bits:</span><span class="stat-value" id="transBits">0</span></div><div class="stat-row"><span>Errors Injected:</span><span class="stat-value color-red" id="errInj">0</span></div><div class="stat-row"><span>Errors Corrected:</span><span class="stat-value color-green" id="errCorr">0</span></div><div class="stat-row"><span>Correction Efficiency:</span><span class="stat-value" id="corrEff">0%</span></div><div class="progress-container"><div class="progress-bar bar-orange" id="corrBar"></div></div></div>
+                    <div class="stat-card card-green"><h3><i class="fas fa-flag-checkered"></i> Final Output Quality</h3><div class="stat-row"><span>Original Bytes:</span><span class="stat-value" id="origBytes">0</span></div><div class="stat-row"><span>Restored Bytes:</span><span class="stat-value" id="finalBytes">0</span></div><div class="stat-row"><span>Text Match Accuracy:</span><span class="stat-value" id="finalAcc">0%</span></div><div class="progress-container"><div class="progress-bar" id="accBar"></div></div></div>
                 </div>
             </div>
         </div>
 
-        <footer>
-            <p><strong>Supervised by:</strong> Dr. Mohamed Faysel</p>
-            <p>Developed by:</p>
-            <ul class="team-list">
-                <li>Ahmed Toba Mahmoud</li>
-                <li>Ahmed Shaban Sayed</li>
-                <li>Adham Mahmoud Hamed</li>
-                <li>Mahmoud Saleh Awad</li>
-            </ul>
-            <p style="margin-top: 20px; font-size: 0.8rem">
-                &copy; 2025 - 2026 Information Theory Project
-            </p>
-        </footer>
+        <!-- ==================== TAB 2: HARQ SIMULATION ==================== -->
+        <div class="tab-content" id="tab-harq">
+            <div class="upload-card">
+                <h2><i class="fas fa-satellite-dish"></i> HARQ Simulation with Incremental Redundancy</h2>
+                <p>Full Chapter 17 pipeline: Huffman → CRC-16 → Extended Hamming(8,4) → BSC → IR Loop</p>
+                <form id="harqForm">
+                    <div class="file-input-wrapper">
+                        <label class="btn-upload" for="harqFile"><i class="fas fa-file-alt"></i><span id="harqFileName">Choose File...</span></label>
+                        <input type="file" id="harqFile" accept=".txt" required />
+                    </div>
+                    <div class="controls-grid">
+                        <div class="control-group">
+                            <label>Error Rate (p)</label>
+                            <input type="range" id="harqErrorRate" min="0.001" max="0.15" step="0.001" value="0.02" />
+                            <span class="range-value" id="harqErrorVal">0.020</span>
+                        </div>
+                        <div class="control-group">
+                            <label>Max IR Stages (M)</label>
+                            <select id="harqMaxStages"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select>
+                        </div>
+                        <div class="control-group">
+                            <label>Threshold κ</label>
+                            <input type="range" id="harqKappa" min="0.5" max="2.0" step="0.1" value="1.0" />
+                            <span class="range-value" id="harqKappaVal">1.0</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit" id="harqSubmit">Run HARQ Simulation</button>
+                </form>
+                <div class="loader" id="harqLoader"></div>
+            </div>
+            <div id="harqResults" class="results-hidden">
+                <h2 class="section-title"><i class="fas fa-stream"></i> IR Loop Timeline</h2>
+                <div id="irTimeline" class="ir-timeline"></div>
+                <div class="stats-grid">
+                    <div class="stat-card"><h3><i class="fas fa-compress-arrows-alt"></i> Source Coding</h3><div id="harqCompStats"></div></div>
+                    <div class="stat-card card-orange"><h3><i class="fas fa-shield-alt"></i> Channel Coding</h3><div id="harqChannelStats"></div></div>
+                    <div class="stat-card card-purple"><h3><i class="fas fa-sync-alt"></i> IR Performance</h3><div id="harqIRStats"></div></div>
+                    <div class="stat-card card-green"><h3><i class="fas fa-flag-checkered"></i> Final Quality</h3><div id="harqQualityStats"></div></div>
+                </div>
+                <div class="text-compare-section">
+                    <div class="text-box"><h4>Original Text</h4><pre id="harqOrigText"></pre></div>
+                    <div class="text-box"><h4>Restored Text</h4><pre id="harqRestoredText"></pre></div>
+                </div>
+            </div>
+        </div>
 
-        <script>
-            // UI Interaction for File Input
-            function updateFileName() {
-                const input = document.getElementById("fileInput");
-                const label = document.getElementById("fileName");
-                if (input.files.length > 0) {
-                    label.textContent = input.files[0].name;
-                    label.style.color = "#0d47a1";
-                }
-            }
+        <!-- ==================== TAB 3: PERFORMANCE ANALYSIS ==================== -->
+        <div class="tab-content" id="tab-analysis">
+            <div class="upload-card">
+                <h2><i class="fas fa-chart-line"></i> Monte Carlo Performance Analysis</h2>
+                <p>Run thousands of trials to generate BER, FER, Throughput, and Retransmission curves</p>
+                <form id="mcForm">
+                    <div class="file-input-wrapper">
+                        <label class="btn-upload" for="mcFile"><i class="fas fa-file-alt"></i><span id="mcFileName">Choose File...</span></label>
+                        <input type="file" id="mcFile" accept=".txt" required />
+                    </div>
+                    <div class="controls-grid">
+                        <div class="control-group"><label>Min Error Rate</label><input type="number" id="mcMin" value="0.001" min="0.0001" max="0.1" step="0.001" /></div>
+                        <div class="control-group"><label>Max Error Rate</label><input type="number" id="mcMax" value="0.08" min="0.01" max="0.2" step="0.01" /></div>
+                        <div class="control-group"><label>Test Points</label><input type="number" id="mcPoints" value="12" min="5" max="30" /></div>
+                        <div class="control-group"><label>Trials/Point</label><input type="number" id="mcTrials" value="200" min="50" max="5000" /></div>
+                        <div class="control-group"><label>Max IR Stages</label><select id="mcStages"><option>2</option><option>3</option><option selected>4</option><option>5</option></select></div>
+                        <div class="control-group"><label>Threshold κ</label><input type="number" id="mcKappa" value="1.0" min="0.5" max="2.0" step="0.1" /></div>
+                    </div>
+                    <button type="submit" class="btn-submit" id="mcSubmit">Run Monte Carlo Analysis</button>
+                </form>
+                <div class="loader" id="mcLoader"></div>
+                <div class="progress-info" id="mcProgress"></div>
+            </div>
+            <div id="mcResults" class="results-hidden">
+                <h2 class="section-title"><i class="fas fa-chart-area"></i> Performance Comparison</h2>
+                <div class="charts-grid">
+                    <div class="chart-card"><canvas id="chartBER"></canvas></div>
+                    <div class="chart-card"><canvas id="chartFER"></canvas></div>
+                    <div class="chart-card"><canvas id="chartThroughput"></canvas></div>
+                    <div class="chart-card"><canvas id="chartRetrans"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            // Logic to communicate with Backend
-            document
-                .getElementById("uploadForm")
-                .addEventListener("submit", async function (e) {
-                    e.preventDefault();
+    <footer>
+        <p><strong>Supervised by:</strong> Dr. Mohamed Faysel</p>
+        <p>Developed by:</p>
+        <ul class="team-list">
+            <li>Ahmed Toba Mahmoud</li><li>Ahmed Shaban Sayed</li><li>Adham Mahmoud Hamed</li><li>Mahmoud Saleh Awad</li><li>Mahmoud Ahmed</li><li>Hadeer Naser</li><li>Rana Tamer</li>
+        </ul>
+        <p class="copyright">&copy; 2025 - 2026 Information Theory Project | Based on Ch.17 — Tomlinson et al.</p>
+    </footer>
 
-                    const formData = new FormData();
-                    const fileInput = document.getElementById("fileInput");
-
-                    if (fileInput.files.length === 0) {
-                        alert("Please select a file first!");
-                        return;
-                    }
-
-                    formData.append("textFile", fileInput.files[0]);
-
-                    // Show Loader, Hide Button
-                    document.getElementById("loader").style.display = "block";
-                    document.getElementById("submitBtn").disabled = true;
-                    document.getElementById("submitBtn").innerText =
-                        "Processing...";
-                    document.getElementById("resultsSection").style.display =
-                        "none";
-
-                    try {
-                        // Sending Request
-                        const response = await fetch("/api/process", {
-                            method: "POST",
-                            body: formData,
-                        });
-
-                        const data = await response.json();
-
-                        if (response.ok) {
-                            displayResults(data);
-                        } else {
-                            alert("Error: " + data.error);
-                        }
-                    } catch (error) {
-                        console.error(error);
-                        alert(
-                            "Something went wrong! Make sure the server is running."
-                        );
-                    } finally {
-                        // Reset Loader
-                        document.getElementById("loader").style.display =
-                            "none";
-                        document.getElementById("submitBtn").disabled = false;
-                        document.getElementById("submitBtn").innerText =
-                            "Start Simulation";
-                    }
-                });
-
-            function displayResults(data) {
-                const stats = data.statistics;
-                const noise = stats.noise_simulation;
-
-                // 1. Update Download Links (Adding Host URL just in case, though relative works)
-                document.getElementById("linkProb").href =
-                    data.download_links.probabilities;
-                document.getElementById("linkCheck").href =
-                    data.download_links.decoding_check_part3;
-                document.getElementById("linkFinal").href =
-                    data.download_links.final_restored_text;
-
-                // 2. Update Huffman Stats
-                document.getElementById("origSize").innerText =
-                    stats.original_size_in_bits.toLocaleString() + " bits";
-                document.getElementById("compSize").innerText =
-                    stats.compressed_size_in_bits.toLocaleString() + " bits";
-                document.getElementById("compRatio").innerText =
-                    stats.compressed_efficiency;
-                document.getElementById("compBar").style.width =
-                    stats.compressed_efficiency;
-
-                // 3. Update Noise Stats
-                document.getElementById("transBits").innerText =
-                    noise.total_size_in_bits_transmitted.toLocaleString();
-                document.getElementById("errInj").innerText =
-                    noise.total_errors_injected;
-                document.getElementById("errCorr").innerText =
-                    noise.total_errors_corrected_by_hamming;
-                document.getElementById("corrEff").innerText =
-                    noise.correction_efficiency;
-                document.getElementById("corrBar").style.width =
-                    noise.correction_efficiency;
-
-                // 4. Update Final Output Stats
-                document.getElementById("origBytes").innerText =
-                    stats.original_text_size_bytes;
-                document.getElementById("finalBytes").innerText =
-                    stats.final_restored_text_size_bytes;
-                document.getElementById("finalAcc").innerText =
-                    stats.final_restored_text_efficiency;
-                document.getElementById("accBar").style.width =
-                    stats.final_restored_text_efficiency;
-
-                // Show results
-                document.getElementById("resultsSection").style.display =
-                    "block";
-            }
-        </script>
-    </body>
+    <script src="/app.js"></script>
+</body>
 </html>
