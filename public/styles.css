@@ -523,6 +523,10 @@ header p {
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 20px;
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    height: 350px;
 }
 
 /* Footer */

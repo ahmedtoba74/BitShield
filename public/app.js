@@ -419,6 +419,7 @@ function createChart(canvasId, title, labels, datasets, logScale) {
         data: { labels, datasets },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             interaction: { mode: "index", intersect: false },
             plugins: {
                 title: {
